@@ -4,7 +4,7 @@
 # Brylle Cagadas
 
 
-rsa_file="$HOME/.ssh/id_rsa"
+rsa_file="$HOME/.ssh/id_rsa.pub"
 if [ ! -f $rsa_file ]
 then
   # Create rsa ssh-keygen file
