@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# Filename: backup.sh
+#
 # Script author
 # Brylle Cagadas
 
@@ -8,7 +10,7 @@ rsa_file="$HOME/.ssh/id_rsa.pub"
 if [ ! -f $rsa_file ]
 then
   # Create rsa ssh-keygen file
-  mkdir -p $HPME/.ssh
+  mkdir -p $HOME/.ssh
   chmod 0700 $HOME/.ssh
   ssh-keygen -t rsa -f $rsa_file -P ''
 fi
