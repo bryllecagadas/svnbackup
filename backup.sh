@@ -23,6 +23,7 @@ dir_err="Pass a valid SVN repository parent directory."
 remote_dir_err="Invalid remote directory."
 # Not compress file by default
 compress_file=false
+timestamp="$(date +%m-%d-%y_%H-%M)"
 
 # Get the options given to the script
 while getopts ":c" opt; do
@@ -66,7 +67,7 @@ then
   exit 1
 fi
 
-tar_file="$(date +%m-%d-%y_%H-%M).tar.gz"
+tar_file="$timestamp.tar.gz"
 
 # Create dump files in the remote server
 if [ -f "create-dump.sh" ]
@@ -111,20 +112,55 @@ case $dest in
 ;;
 esac
 
-echo "cat $dest$tar_file | tar xvz"
-
 # Verify dump files
 echo "Verifying the backup..."
 if [ -f $dest$tar_file ]
 then
   echo "Extracting files..."
-  if tar xvfz "$dest$tar_file";
+  mkdir -p temp
+  temp_dir="$(pwd)/temp"
+  if tar -C $temp_dir -xvzf "$dest$tar_file";
   then
-    echo "Success"
+    dump_files="$temp_dir/*.dump"
+    log_file="$temp_dir/dump-$timestamp.log"
+    touch $log_file
   fi
 else
   echo "Tar file not found."
   exit 1
 fi
+
+loop=true
+while $loop
+do
+  echo "Provide a local directory to act as testing repository:"
+  read svnrepo
+  if [ ! -d $svnrepo ]
+  then
+    echo "\nDirectory not found"
+  else
+    loop=false
+  fi
+done
+
+# Loading each svn dump file
+mkdir -p "$svnrepo" # So we don't have to check if the directory exists
+for f in $dump_files
+do
+  if [ -f $f ]
+  then
+    echo "Verifying $(basename $f)..."
+    rm -Rf "$svnrepo"
+    mkdir -p "$svnrepo"
+    svnadmin create "$svnrepo"
+    svnadmin load "$svnrepo" < $f >> $log_file
+    echo "Done."
+  fi
+done
+
+mv $log_file "$dest"dump-$timestamp.log
+echo "Doing cleanup..."
+rm -Rf $temp_dir
+echo "Successfully made backup in $dest"
 
 exit 0
