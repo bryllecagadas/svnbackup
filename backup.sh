@@ -7,6 +7,8 @@
 #
 # TODO:
 # The arguments mentioned below, at the moment, are all required
+# Remove required arguments, and ask them as the script executes. It seems silly that the
+# script initially requires for arguments, and will ask additional arguments later in the execution.
 #
 # Usage:
 # script [-c] [user@hostname] [remote_directory] [destination_directory]
