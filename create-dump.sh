@@ -79,7 +79,7 @@ then
       exit 1;
     fi
     # Cleanup
-    echo "Doing cleanup."
+    echo "Doing cleanup..."
     rm -f *.dump
   fi
 fi
