@@ -15,7 +15,7 @@
 # -c				Compresses the dump file using tar in gzip format
 # user@hostname			The remote server user@hostname
 # remote_directory		The remote server SVNParent directory
-# destination_directory		The destination remote directory to copy the resulting files to
+# destination_directory		The destination directory to copy the resulting files to
 
 # Invalid svn directory error
 dir_err="Pass a valid SVN repository parent directory."
@@ -68,9 +68,10 @@ fi
 
 tar_file="$(date +%m-%d-%y_%H-%M).tar.gz"
 
+# Create dump files in the remote server
 if [ -f "create-dump.sh" ]
 then
-  echo "Looking for valid repositories."
+  echo "Looking for valid repositories..."
   if ssh $remote 'bash -s' < create-dump.sh "$src" "$tar_file";
   then
     echo "Successfully created dump files."
@@ -82,12 +83,48 @@ else
   exit 1
 fi
 
-echo "Downloading the dump file(s)."
-if ssh $remote "bash -s" < download-dump.sh "$tar_file" > "$dest/$tar_file";
+# Download the dump files in the remote server
+if [ -f "download-dump.sh" ]
 then
-  echo "Successfully downloaded file."
+  echo "Downloading the dump file(s)..."
+  if ssh $remote "bash -s" < download-dump.sh "$tar_file" > "$dest/$tar_file";
+  then
+    echo "Successfully downloaded file."
+  else
+    echo "An error has occured while downloading the file."
+    exit 1
+  fi
 else
-  echo "An error has occured while downloading the file."
+  echo "Cannot find download-dump.sh."
+fi
+
+# Append trailing slash if none is given
+case $dest in
+'.')
+  dest="$(pwd)/"
+;;
+*/)
+  dest="$dest"
+;;
+*)
+  dest="$dest/"
+;;
+esac
+
+echo "cat $dest$tar_file | tar xvz"
+
+# Verify dump files
+echo "Verifying the backup..."
+if [ -f $dest$tar_file ]
+then
+  echo "Extracting files..."
+  if tar xvfz "$dest$tar_file";
+  then
+    echo "Success"
+  fi
+else
+  echo "Tar file not found."
   exit 1
 fi
+
 exit 0

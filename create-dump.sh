@@ -66,7 +66,7 @@ done
 if [ "$files" ]
 then
   # Create tar file
-  echo "Creating tar file."
+  echo "Creating tar file..."
   if tar cfz $tar_file $files;
   then
     # Check if tar file exists, thus, succesfully created
