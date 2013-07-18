@@ -6,7 +6,8 @@
 # Brylle Cagadas
 
 
-rsa_file="$HOME/.ssh/id_rsa.pub"
+rsa_key="$HOME/.ssh/id_rsa.pub"
+rsa_file="$HOME/.ssh/id_rsa"
 if [ ! -f $rsa_file ]
 then
   # Create rsa ssh-keygen file
@@ -32,7 +33,7 @@ do
   fi
 done
 
-cat $rsa_file | ssh "$ssh_args1" "mkdir -p .ssh && cat >> .ssh/authorized_keys" && ssh_success=true
+cat $rsa_key | ssh "$ssh_args1" "mkdir -p .ssh && cat >> .ssh/authorized_keys" && ssh_success=true
 
 if $ssh_success
 then
