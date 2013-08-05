@@ -11,13 +11,14 @@
 # script initially requires for arguments, and will ask additional arguments later in the execution.
 #
 # Usage:
-# script [-c] [user@hostname] [remote_directory] [destination_directory]
+# script [-c] [user@hostname] [remote_directory] [destination_directory] [local_repo]
 #
 # Options:
 # -c				Compresses the dump file using tar in gzip format
 # user@hostname			The remote server user@hostname
 # remote_directory		The remote server SVNParent directory
-# destination_directory		The destination directory to copy the resulting files to
+# destination_directory		The destination local directory to copy the resulting files to
+# local_repo			Local repository created by svnadmin to test the dowloaded backup dump
 
 # Invalid svn directory error
 dir_err="Pass a valid SVN repository parent directory."
@@ -48,6 +49,7 @@ done
 remote=$2
 src=$3
 dest=$4
+svnrepo=$5
 
 # Check if the remote source directory is present
 if [ $src ]
@@ -132,18 +134,18 @@ else
   exit 1
 fi
 
-loop=true
-while $loop
-do
-  echo "Provide a local directory to act as testing repository:"
-  read svnrepo
-  if [ ! -d $svnrepo ]
-  then
-    echo "\nDirectory not found"
-  else
-    loop=false
-  fi
-done
+#loop=true
+#while $loop
+#do
+#  echo "Provide a local directory to act as testing repository:"
+#  read svnrepo
+#  if [ ! -d $svnrepo ]
+#  then
+#    echo "\nDirectory not found"
+#  else
+#    loop=false
+#  fi
+#done
 
 # Loading each svn dump file
 mkdir -p "$svnrepo" # So we don't have to check if the directory exists
